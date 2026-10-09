@@ -369,6 +369,53 @@ while(fast != nullptr && fast-> next != nullptr){
 - [ ] LC 92 
 - [ ] LC 143 
 - [ ] LC  2
+
+
+# String 字符串 
+- String  = charatecr array + length ;
+- 具有   string  方法 ，  index / .length() 方法 
+-  iteration / substring / compare / concatenate  
+
+## naive matching
+ - the time complexity of n.m is O（nm) 
+## KMP Kuunuth-Morris-Pratt   字符查找算法 
+- this algorithm find the identical prefix for each step
+ - implmetation 
+```C++
+// using two pointer to mainain 
+int i = 0 ; //text 
+int j = 0 ; // pattern 
+
+while(i < text.length()){
+
+if(text[i] == pattern [j]){
+	i++;
+	j++;
+
+}
+
+if(j == pattern.length()){
+	return 
+}
+
+else if (i < text.length() && text[i] != pattern[j]){
+
+if(j != 0 )
+{
+
+j = lps[j-1];
+	
+	}else{
+	
+	i++;
+		}
+	}
+}
+```
+
+## prefix / failure array 
+## 
+
 # Stack 
 ## 性质
 - LIFO （last in first out) 
@@ -517,7 +564,7 @@ vector<int> v = {10,20,30};
 # Tree
 	 既然都学到tree 了，为啥不看看BFS /DFS/recursion 呢？ 
 ## basis
- - 根节点 ，子节点 ，叶节点 ， 路径 ，深度（从根节点到目前节点的长度）  ，高度 
+ - 根节点 ，子节点 ，叶节点 ， 路径 ，深度(from top to the bottom）  ，高度 (from bottom to the top )
 	 - depth + height  = ...
 - N个节点 ， N-1 条边 
 - 树中间不包括环 
@@ -533,34 +580,239 @@ struct TreeNode{
 	TreeNode* right; 
 }; 
 ```
-
 ## 二叉树 
 - 直接在 LinkedList 基础上添加 ...
 
-	下面解释三种常见的算法结构 
-
-### Preorder 前序遍历 
-- 遵循根-左-右 顺序 
+### Traversal  for Binary tree 
+*  均使用 DFS（深度优先算法） 
+#### preorder 
+-  root -left - right 
+``` C++
+void preorder (TreeNode* root){
+	if(root == NULL) return ;
+	cout << root-val << " " ;
+	preorder(root -> left);
+	preorder(root -> right);
+	}
+```
+ - 适合BFS 
+#### inorder 
+- left - root -right
 ```C++
-void preorder(TreeNode* root){
-	if (root == nullptr) return ;
+void inorder( TreeNode* root){
+	if(root == NULL) return 
+	inorder(root -> left);
 	
 	cout << root->val << " " ;
-	preorder(root->left);
-	preorder(root -> right);
+	
+	inorder(root -> right);
 }
 ```
-## B  树
-## 红黑树 （ 手写！）
+- 适合BST 
+#### postorder 
+- left - right - root 
+- 适合删除/ DP 
+### BFS -- level order 
+- 使用level-order 先处理离根最近的 ，再处理远的 
+- 一般层序遍历会使用 Queue实现,满足 FIFO特点  
+```C++
+void LevelOrder(TreeNode* root){
+	if (root == NULL) return;
+	
+	queue<TreeNode*> q; 
+	
+	q.push(root);
+	
+	while(!q.empty()){
+		
+		TreeNode* curr =q.front(); //队顶 （最后出来的值） 
+		
+		q.pop(); 
+		cout << curr-> val << " ";
+		
+		if(curr -> left != NULL){
+			q.push(curr -> left);
+			}
+			
+		if(curr -> right != NULL){
+			q.push(curr -> right);
+		}
+	}
 
-# BST/AVL
+}
+
+
+```
+## BST  二叉搜索树 
+### invariant : 
+left < root < right 
+
+### searcch
+- 利用平衡二叉树有序的特点, 主动减枝 
+```C++
+TreeNode* search(TreeNode* root , int x){
+	if (root  == nullptr){
+		return nullptr ;
+	}
+	if (root -> val  == x) {
+		return root ;
+		}
+	if( x < root -> val){
+		return search(root-> left ,x);
+	}
+	else {
+		return search(root->right ,x) ; 
+	}
+
+}
+```
+- 时间复杂度是 O(logn ) (for balanced tree)
+	- O(n ) ( completely not balance)
+### insert 
+```C++
+TreeNode* insert(TreeNode* root , int x ){
+	if( root == nullptr){
+		return new TreeNode(x);
+		}
+	
+	if(root -> vall > x){
+		root-> left = insert(root-> left ,x);
+		}	
+	else if(x > root -> val){
+		root -> right = insert(root-> right ,x);
+		}
+	
+		return root;
+	}
+```
+- 比起 Sorted Array , insert tree使用 logn 实现更好的插入 
+### delete 
+- delete考虑子节点情况 ，对于无/单 子节点 ，参见链表删除 
+- 对于双节点问题 ： 为了维持BST的性质 ，选取 **右子树的最小左节点** ，既保证了右侧>左侧， 又是最小值 
+```C++
+TreeNode* deleteNullRoot(TreeNode* root ){
+	delete root;
+	return nullptr;
+}
+TreeNode* deleteOneRoot(TreeNode* root ){
+	if(root-> left == nullptr){
+		TreeNode* temp = root -> right;
+		delete root ;
+		return temp ;
+	}else{
+		TreeNode* temp = root-> left;
+		delete root ;
+		return temp;
+		}
+	
+}
+TreeNode* deleteTwoRoot(TreeNode* root ){
+//select the least value in the right part ;
+TreeNode* curr1 = root ;
+while(curr1 -> left != nullptr && curr->right != nullptr) {
+	if( curr1 -> left == nullptr) 
+		{curr1 -> val = curr1-> right-> val; 
+		curr1 = curr1-> right ;
+	}
+	else
+	{ 
+		curr1 -> val = curr1 ->left -> val ;
+		curr1 = curr1 -> left;}
+	int temp = curr1-> val ;
+	root -> val = temp; 
+	delete curr1 ;
+	
+	}
+	
+}
+TreeNode* delete(TreeNode* root  ,int x ){
+TreeNode* nodeToDelete =  search( root , x );
+if(root  == nullptr) return deleteNullRoot(root) ;
+if(root -> left == nullptr || root -> right == nullptr) return deleteOneRoot(root) ;
+else return deleteTwoRoot(root);
+
+}
+```
+## AVL 
+### height 
+``` C++
+int height(TreeNode* root){
+
+	if(root == nullptr){
+		return  0 ;
+		}
+	
+	return 1 + max(height(root -> left), height(root -> right ));
+	
+	}
+	
+```
+- 本质是postorder  traversal 
+### balance factor 
+BF  = height(left)  - height(right)
+- 限制 BF为(-1,1)的区间 ，不然失衡 
+### Rotation 
+- 把某个节点的父节点变成子节点 
+#### LL,RR,RL,LR 
+
+- LL : right rotation 
+- RR : left rotation 
+- LR :left rotation (-> LL) + right rotation 
+- RL : right rotation (-> RR)+ left rotation
+
+	a 
+
+AVL tree use two step for BF to calculation its shape ; 
+### AVL insert 
+
+
+## Red-Black Tree
+##  B  树
+
+## B+ tree 
 # Heap 
+
+## Max Heap 
+ - Parent >= children 
+
+- HEAP  is exactly a type of Complete Binary Tree 
+
+
+### Heapify 
+ - convert any type of the heap int **MaxHeap**
+- from top to the bottom ,we maintain each Node : 
+
+```CPP
+void heapify(int arr [] , int n , int i ){
+
+ int farther = i ;
+ int left = 2* i +1 ;
+ int right = 2* i + 2 ; 
+
+ if ( left < n && arr[left] > arr[farther]){
+	 fartehr = left;
+ }
+ if( reight < n && arr[rigth] > arr [farther]){
+	 farther = right ;
+	 }
+// switch the index	 
+if( largest != i){
+	swap(arr[i] , arr[largest]);
+	//switch the value 
+	heapify(arr, n , largest);
+		// recursion
+		}
+	}
+```
 # Hash Table 
 
 # Graph 
 
 # Union Find 
 # Sorting 
+- 主要算法分为两种类型： comparison- based (quadratic cost， nlogn cost , quick sort) 
+
+	 O(n)的复杂度 
 ## Bubble Sort 冒泡排序 
 - 比较相邻的数据并排序
 ```C++ 
@@ -584,7 +836,8 @@ for(int i = 0 ; i< arr.length(); i++){
 - O($n^{2}$) (worst case )
 - O($n^{2}$)(armotized case)
 ##  Selection Sort选择排序 
- - 每次找到最小的数 ，之后根据位置排序 
+	- 错过，要注意是对最后的数据进行swap ，不要和 insetion搞混了  
+ - 每次找到最小的数 ，之后swap!
 ```C++
 int main(){
 int [] arr ; 
@@ -604,12 +857,122 @@ for(int i = 0 ; i < arr.length(); i++){
 }
 ```
 - 时间复杂度： O($n^{2}$) (worst case )
-	-  O（ $n^{2}$ ）(armotized case )
-
+		-  O（ $n^{2}$ ）(armotized case )
+ -  unstable when bordary is set to be  >= , not >  because of swap action .
 ## Insetion Sort 
-
+- 维护已排序区和未排序区 
+	- 对于已知区进行排序
+		- 位置区域（逐渐增加：比较）
+```C++
+for(int i = 0 ; i < arr.length();i++){
+//已经排序区间比较
+	for(int j =  i ;  j >=0 ; j--){
+		// 终止条件： 目前数据不小于当前数据
+		// 每个对象挪出位置
+		arr[j+1] = arr[j];
+		if(arr[i]>= arr[j]){
+			arr[j+1] =arr[i];
+			break; 
+			}
+		}
+	}
+```
+- insertion 比起selection ,不保证第一轮拥有最小数字( onlilne algorithom)
+ - 算法复杂度分析 ： 
+	 - worst: O(n^2)
+		 - armotizedO(n^2)
+	O(nlog n)的复杂度 
 ## Merge Sort  
-- 与
+- 把数组拆解成最小单元 （一个数组）
+	- merge数组
+		- 双指针比较 
+
+```C++
+void mergeSort(int arr[] , int left , int right){
+	if(left >= right){
+		return ;
+		}
+	
+	int mid = left + (right - left) /2; 
+	
+	mergeSort(arr, left ,mid);
+	mergeSort(arr, mid+1 , right);
+	
+	merge(arr, left ,mid ,right);
+	}
+void merge(int arr[], int left , int mid ,int right){
+	vector<int> temp; 
+	int i = left ; 
+	int j  = mid +1 ; 
+	
+	while(i <= mid && j <= right ){
+		if(arr[i] <= arr[j]){
+			temp.push_back(arr[i]);
+			i++;
+			} else{
+			temp.push_back(arr[j]);
+			j++;
+			}
+		}
+		
+	while( i <= mid){
+		temp.push_back(arr[i]);
+		i++;
+		}
+	while(j <= right){
+		temp.push_back(arr[j]);
+		j++;
+		}
+	//
+	for( int k = 0 ; k < temp.size(); k++){
+		arr[left + k] = temp[k];
+		}
+	}
+```
+
+- 算法复杂度分析 ：
+	 - 二分： O(logn) x 遍历排序 O(n)
+
+# Master Theory 主定理 
+ - 复杂度的分析问题
+for $$
+T(n) = aT\left( \frac{n}{b} \right) +f(n)
+$$
+when n = 1 :复杂度为O(1);
+when n >= 2 : 
+$T(n)=\alpha T( \left[ \frac{n}{\beta} \right] ) +o(n^{r})$
+
+## Heap Sort 
+-  HEAP是完全二叉树 ，通过数组实现 
+	- 从上至下 ，从左往右存入数组
+		-  对于某个节点i: 
+			- left = 2 * i   +1 
+				right = 2* i  +2 
+			-  parent =  (i-1) /2 ; 
+
+
+```C++
+void heapify() {}
+void heap_sort(){
+// 从第一个非叶节点开始 ，build the heap ;
+for( int i =  n/2 - 1 ; i >= 0 ; i--){
+	heapify(arr, n ,i)
+	}
+ 
+for( int i = n-1 ; i > 0 ; i --){
+	
+	swap(arr[0],arr[i]);
+	
+	heapify(arr, i , 0 )
+	} //sort the heap 
+
+}
+```
+- time complexity : O( nlog n )
+	- heapify : O(log n )
+	-  build Heap O(n)
+- build heap proove the root to be  the maxium, 注意反例！![[57ccec71f83b09005ae5f766a3211ec4 1.jpg]]
+## Quick Sort
 # Binary Search 
 - 二分查找
 ```C++
@@ -631,16 +994,16 @@ int main(){
  - first >= x : return left
  - first> x (if arr[mid] <left )  , return left 
  - last <= x  if(arr[mid] <= left) return right 
+ - 有等就等 ，大左小右 
 # 
 # Greedy 
 
 # Backtracking 
 
-# Divide & Conquer
+# Divide & Conquer 分治
+ - 通过divide 划分 更小的数据 ，通过Conquer 递归解决 ，最后Combine合并答案 
 
 # DP 
-# GA2
-
 # 课堂lab整理
 # RAM 计算模型 
 ![[Pasted image 20260922024710.png]]
@@ -676,4 +1039,6 @@ int main(){
 # Asymptotic Analysis 渐近分析 
 
 
-
+# Randomization
+Randomization在说什么 
+和quick sort有什么关系 
