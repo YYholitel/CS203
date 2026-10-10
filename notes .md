@@ -843,9 +843,7 @@ Node* insert (Node* node ,int key){
 }
 
 ```
-
-	·
-
+### AVL remove 
 
 ## Red-Black Tree
 ##  B  树
