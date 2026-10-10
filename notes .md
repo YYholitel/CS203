@@ -973,6 +973,14 @@ for( int i = n-1 ; i > 0 ; i --){
 	-  build Heap O(n)
 - build heap proove the root to be  the maxium, 注意反例！![[57ccec71f83b09005ae5f766a3211ec4 1.jpg]]
 ## Quick Sort
+- 随机选取 pivot 
+- partition : 小的放左边， 大的放右边 
+- 递归
+
+### 算法复杂度 
+- O（n logn)
+	- O(n^2)（worst) 
+
 # Binary Search 
 - 二分查找
 ```C++
