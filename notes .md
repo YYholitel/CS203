@@ -734,7 +734,28 @@ else return deleteTwoRoot(root);
 }
 ```
 ## AVL 
+- 就是BF绝对值小于1的BST
+-  implementation of AVL
+```C++
+struct Node{
+	int key ;
+	int height ;
+	
+	Node* left ;
+	Node* right; 
+	
+	Node(int k){
+		key = k ; 
+		height =1 ; 
+		
+		left = NULL;
+		right = NULL;
+		}
+
+};
+```
 ### height 
+- 高度通过直接累加得到 
 ``` C++
 int height(TreeNode* root){
 
@@ -748,22 +769,82 @@ int height(TreeNode* root){
 	
 ```
 - 本质是postorder  traversal 
+
 ### balance factor 
 BF  = height(left)  - height(right)
 - 限制 BF为(-1,1)的区间 ，不然失衡 
 ### Rotation 
 - 把某个节点的父节点变成子节点 
+- right rotation
+- 当左节点高于右节点时，需要右旋平衡树
+        y
+        / \
+      x   T3
+     / \
+    T1  T2
+```C++
+//存节点
+Node* x = y -> left; 
+Node* T2 =  x -> right ; 
+// 获取节点
+x-> right = y ;
+y-> left = T2;
+//自下向上更新y 
+update(y);
+update(x);
+```
+	   x 
+	/   \
+	T1  y
+		/ \
+		T2 T3
+- left rotation 
+- 右节点高于左节点时，通过左旋平衡树
+        x
+       / \
+      T1  y
+         / \
+        T2  T3
+```C++
+Node*  y = x-> right;
+Node* T2 = y-> left; 
+
+x-> right = T2 ;
+y-> left = x ;
+
+update(x);
+update(y);
+```
+- 一定要理解图解 
 #### LL,RR,RL,LR 
 
 - LL : right rotation 
 - RR : left rotation 
-- LR :left rotation (-> LL) + right rotation 
-- RL : right rotation (-> RR)+ left rotation
+- LR :left **child** rotation (-> LL)  + right  **root** rotation 
+- RL : right **child** rotation (-> RR)+ left  **root** rotation
 
-	a 
-
-AVL tree use two step for BF to calculation its shape ; 
 ### AVL insert 
+ - 就是一个BST  insert + 修建平衡 
+```C++
+Node* insert (Node* node ,int key){
+	
+	if(node == nullptr)
+		return new Node(key);
+		
+	if(key < node-> key) 
+		node -> left = insert(node-> left, key);
+		
+	else if (key > node-> key)
+		node -> right = insert(node-> right ,key);
+	
+	esle
+		return node ;
+
+}
+
+```
+
+	·
 
 
 ## Red-Black Tree
